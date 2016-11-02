@@ -1,4 +1,4 @@
-#FFmpeg:
+# License
 
 Most files in FFmpeg are under the GNU Lesser General Public License version 2.1
 or later (LGPL v2.1+). Read the file `COPYING.LGPLv2.1` for details. Some other
@@ -13,16 +13,18 @@ configure to activate them. In this case, FFmpeg's license changes to GPL v2+.
 Specifically, the GPL parts of FFmpeg are:
 
 - libpostproc
-- optional x86 optimizations in the files
-  - `libavcodec/x86/flac_dsp_gpl.asm`
-  - `libavcodec/x86/idct_mmx.c`
-  - `libavfilter/x86/vf_removegrain.asm`
-- libutvideo encoding/decoding wrappers in
-  `libavcodec/libutvideo*.cpp`
+- optional x86 optimization in the files
+    - `libavcodec/x86/flac_dsp_gpl.asm`
+    - `libavcodec/x86/idct_mmx.c`
+    - `libavfilter/x86/vf_removegrain.asm`
 - the X11 grabber in `libavdevice/x11grab.c`
-- the swresample test app in
-  `libswresample/swresample-test.c`
-- the `texi2pod.pl` tool
+- the following building and testing tools
+    - `compat/solaris/make_sunver.pl`
+    - `doc/t2h.pm`
+    - `doc/texi2pod.pl`
+    - `libswresample/swresample-test.c`
+    - `tests/checkasm/*`
+    - `tests/tiny_ssim.c`
 - the following filters in libavfilter:
     - `f_ebur128.c`
     - `vf_blackframe.c`
@@ -47,9 +49,9 @@ Specifically, the GPL parts of FFmpeg are:
     - `vf_pp.c`
     - `vf_pp7.c`
     - `vf_pullup.c`
+    - `vf_repeatfields.c`
     - `vf_sab.c`
     - `vf_smartblur.c`
-    - `vf_repeatfields.c`
     - `vf_spp.c`
     - `vf_stereo3d.c`
     - `vf_super2xsai.c`
@@ -73,20 +75,17 @@ There are a handful of files under other licensing terms, namely:
 * `tests/reference.pnm` is under the expat license.
 
 
-external libraries
-==================
+## External libraries
 
 FFmpeg can be combined with a number of external libraries, which sometimes
 affect the licensing of binaries resulting from the combination.
 
-compatible libraries
---------------------
+### Compatible libraries
 
 The following libraries are under GPL:
 - frei0r
 - libcdio
 - librubberband
-- libutvideo
 - libvidstab
 - libx264
 - libx265
@@ -101,74 +100,27 @@ license is incompatible with the LGPL v2.1 and the GPL v2, but not with
 version 3 of those licenses. So to combine these libraries with FFmpeg, the
 license version needs to be upgraded by passing `--enable-version3` to configure.
 
-incompatible libraries
-----------------------
+### Incompatible libraries
 
-The Fraunhofer AAC library and FAAC are under licenses which
-are incompatible with the GPLv2 and v3. We do not know for certain if their
-licenses are compatible with the LGPL.
-If you wish to enable these libraries, pass `--enable-nonfree` to configure.
-But note that if you enable any of these libraries the resulting binary will
-be under a complex license mix that is more restrictive than the LGPL and that
-may result in additional obligations. It is possible that these
-restrictions cause the resulting binary to be unredistributeable.
+There are certain libraries you can combine with FFmpeg whose licenses are not
+compatible with the GPL and/or the LGPL. If you wish to enable these
+libraries, even in circumstances that their license may be incompatible, pass
+`--enable-nonfree` to configure. But note that if you enable any of these
+libraries the resulting binary will be under a complex license mix that is
+more restrictive than the LGPL and that may result in additional obligations.
+It is possible that these restrictions cause the resulting binary to be
+unredistributable.
 
+The Fraunhofer FDK AAC and OpenSSL libraries are under licenses which are
+incompatible with the GPLv2 and v3. To the best of our knowledge, they are
+compatible with the LGPL.
 
-********************************************************************************
+The NVENC library, while its header file is licensed under the compatible MIT
+license, requires a proprietary binary blob at run time, and is deemed to be
+incompatible with the GPL. We are not certain if it is compatible with the
+LGPL, but we require `--enable-nonfree` even with LGPL configurations in case
+it is not.
 
-libavcodec/arm/vp8dsp_armv6.S
-
-VP8 ARMv6 optimisations
-
-Copyright (c) 2010 Google Inc.
-Copyright (c) 2010 Rob Clark <rob@ti.com>
-Copyright (c) 2011 Mans Rullgard <mans@mansr.com>
-
-This file is part of FFmpeg.
-
-FFmpeg is free software; you can redistribute it and/or
-modify it under the terms of the GNU Lesser General Public
-License as published by the Free Software Foundation; either
-version 2.1 of the License, or (at your option) any later version.
-
-FFmpeg is distributed in the hope that it will be useful,
-but WITHOUT ANY WARRANTY; without even the implied warranty of
-MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
-Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public
-License along with FFmpeg; if not, write to the Free Software
-Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
-
-This code was partially ported from libvpx, which uses this license:
-
-Redistribution and use in source and binary forms, with or without
-modification, are permitted provided that the following conditions are
-met:
-
-* Redistributions of source code must retain the above copyright
-notice, this list of conditions and the following disclaimer.
-
-* Redistributions in binary form must reproduce the above copyright
-notice, this list of conditions and the following disclaimer in
-the documentation and/or other materials provided with the
-distribution.
-
-* Neither the name of Google nor the names of its contributors may
-be used to endorse or promote products derived from this software
-without specific prior written permission.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-"AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR
-A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT
-HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
-SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
-LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE,
-DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY
-THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
-(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
-OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 ********************************************************************************
 
@@ -268,31 +220,32 @@ XVID MPEG-4 VIDEO CODEC
 
 ********************************************************************************
 
-libavcodec/arm/jrevdct_arm.S
+compat/nvenc/nvEncodeAPI.h
 
-C-like prototype :
-        void j_rev_dct_arm(DCTBLOCK data)
+This copyright notice applies to this header file only:
 
-   With DCTBLOCK being a pointer to an array of 64 'signed shorts'
+Copyright (c) 2010-2015 NVIDIA Corporation
 
-   Copyright (c) 2001 Lionel Ulmer (lionel.ulmer@free.fr / bbrox@bbrox.org)
+Permission is hereby granted, free of charge, to any person
+obtaining a copy of this software and associated documentation
+files (the "Software"), to deal in the Software without
+restriction, including without limitation the rights to use,
+copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the software, and to permit persons to whom the
+software is furnished to do so, subject to the following
+conditions:
 
-   Permission is hereby granted, free of charge, to any person obtaining a copy
-   of this software and associated documentation files (the "Software"), to deal
-   in the Software without restriction, including without limitation the rights
-   to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
-   copies of the Software, and to permit persons to whom the Software is
-   furnished to do so, subject to the following conditions:
+The above copyright notice and this permission notice shall be
+included in all copies or substantial portions of the Software.
 
-   The above copyright notice and this permission notice shall be included in
-   all copies or substantial portions of the Software.
-
-   THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
-   IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
-   FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.  IN NO EVENT SHALL THE
-   COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER
-   IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN
-   CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND,
+EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES
+OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND
+NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY,
+WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+OTHER DEALINGS IN THE SOFTWARE.
 
 ********************************************************************************
 
@@ -435,19 +388,14 @@ libavcodec/fft_fixed_32.c
 libavcodec/fft_init_table.c
 libavcodec/fft_table.h
 libavcodec/mdct_fixed_32.c
-libavcodec/mips/aacdec_mips.c
 libavcodec/mips/aacdec_mips.h
-libavcodec/mips/aacpsdsp_mips.c
-libavcodec/mips/aacsbr_mips.c
 libavcodec/mips/aacsbr_mips.h
 libavcodec/mips/amrwbdec_mips.h
 libavcodec/mips/compute_antialias_fixed.h
 libavcodec/mips/compute_antialias_float.h
 libavcodec/mips/lsp_mips.h
-libavcodec/mips/sbrdsp_mips.c
 libavutil/fixed_dsp.c
 libavutil/fixed_dsp.h
-libavutil/mips/float_dsp_mips.c
 libavutil/mips/libm_mips.h
 libavutil/softfloat_tables.h
 
