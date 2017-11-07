@@ -26,8 +26,8 @@ Current patches:
     copy.
 
   libavcodec/avcodec.h
-    Don't deprecate avcodec_decode_audio4 and avcodec_decode_video2.
-    https://crbug.com/661350
+    Don't deprecate avcodec_decode_audio4, avcodec_decode_video2, and
+    refcounted_frames - https://crbug.com/661350
 
   !!!SECURITY SENSITIVE ISSUE PLEASE VERIFY AFTER EACH FFMPEG ROLL!!!
   Remove UNCHECKED_BITSTREAM_READER defines in libavcodec/

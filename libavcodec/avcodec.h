@@ -2302,7 +2302,7 @@ typedef struct AVCodecContext {
      * - encoding: unused
      * - decoding: set by the caller before avcodec_open2().
      */
-    attribute_deprecated
+    /* attribute_deprecated, blocked on http://crbug.com/661350 */
     int refcounted_frames;
 
     /* - encoding parameters */
