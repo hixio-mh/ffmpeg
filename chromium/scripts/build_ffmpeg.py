@@ -349,6 +349,14 @@ def BuildFFmpeg(target_os, target_arch, host_os, host_arch, parallel_jobs,
          r'#define HAVE_SYSCTL 0 /* \1 -- forced to 0 for Fuchsia */')
     ]
 
+  # Turn off bcrypt, since we don't have it on win.  We will remove the library
+  # below separately.
+  if target_os == 'win':
+    pre_make_rewrites += [
+        (r'(#define HAVE_BCRYPT [01])',
+         r'#define HAVE_BCRYPT 0')
+    ]
+
   RewriteFile(os.path.join(config_dir, 'config.h'), pre_make_rewrites)
 
   # Windows linking resolves external symbols. Since generate_gn.py does not
@@ -357,9 +365,12 @@ def BuildFFmpeg(target_os, target_arch, host_os, host_arch, parallel_jobs,
   # windows. We munge the output of configure here to avoid this LDFLAGS setting
   # triggering mis-detection during configure execution.
   if target_os == 'win':
+    config_mak_rewrites = [
+        (r'(LDFLAGS=.*)', r'\1 -FORCE:UNRESOLVED'),
+        (r'(EXTRALIBS-avutil.*[= ])(bcrypt.lib)', r'\1'),
+        ]
     RewriteFile(
-        os.path.join(config_dir, 'ffbuild/config.mak'), [(r'(LDFLAGS=.*)',
-        r'\1 -FORCE:UNRESOLVED')])
+        os.path.join(config_dir, 'ffbuild/config.mak'), config_mak_rewrites)
 
   # TODO(https://crbug.com/840976): Linking when targetting mac on linux is
   # currently broken.
