@@ -136,6 +136,9 @@ def CleanObjectFiles(object_files):
       'libavutil/tree.o',
       'libavutil/xtea.o',
       'libavutil/xga_font_data.o',
+
+      # Uses bcrypt, which we don't always have.
+      'libavutil/random_seed.o',
   ]
   for name in blacklist:
     name = name.replace('/', os.sep)
