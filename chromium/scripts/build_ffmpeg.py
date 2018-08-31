@@ -830,11 +830,13 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
       ])
 
   # Google Chrome & ChromeOS specific configuration.
-  configure_flags['Chrome'].extend([
+  aac_h264_flags = [
       '--enable-decoder=aac,h264',
       '--enable-demuxer=aac',
       '--enable-parser=aac,h264',
-  ])
+  ]
+  configure_flags['Chrome'].extend(aac_h264_flags)
+  configure_flags['ChromeAndroid'].extend(aac_h264_flags)
 
   # Google ChromeOS specific configuration.
   # We want to make sure to play everything Android generates and plays.
@@ -850,14 +852,6 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
       # Wav files for playing phone messages.
       '--enable-decoder=gsm_ms',
       '--enable-parser=gsm',
-  ])
-
-  configure_flags['ChromeAndroid'].extend([
-      '--enable-demuxer=aac',
-      '--enable-parser=aac',
-      '--enable-decoder=aac',
-
-      # TODO(dalecurtis, watk): Figure out if we need h264 parser for now?
   ])
 
   def do_build_ffmpeg(branding, configure_flags):
