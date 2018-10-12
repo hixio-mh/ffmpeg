@@ -555,7 +555,8 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
       '--enable-decoder=pcm_u8,pcm_s16le,pcm_s24le,pcm_s32le,pcm_f32le,mp3',
       '--enable-decoder=pcm_s16be,pcm_s24be,pcm_mulaw,pcm_alaw',
       '--enable-demuxer=ogg,matroska,wav,flac,mp3,mov',
-      '--enable-parser=opus,vorbis,flac,mpegaudio',
+      # TODO(chcunningham): Add av1 here in the next ffmpeg roll.
+      '--enable-parser=opus,vorbis,flac,mpegaudio,vp8,vp9',
 
       # Setup include path so Chromium's libopus can be used.
       '--extra-cflags=-I' + os.path.join(CHROMIUM_ROOT_DIR,
@@ -582,7 +583,7 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
         # --optflags doesn't append multiple entries, so set all at once.
         '--optflags="-O2"',
         '--enable-decoder=theora,vp8',
-        '--enable-parser=vp3,vp8',
+        '--enable-parser=vp3',
     ])
 
   if target_os in ('linux', 'linux-noasm', 'android'):
@@ -854,10 +855,8 @@ def ConfigureAndBuild(target_arch, target_os, host_os, host_arch, parallel_jobs,
 
   configure_flags['ChromeAndroid'].extend([
       '--enable-demuxer=aac',
-      '--enable-parser=aac',
+      '--enable-parser=aac, h264',
       '--enable-decoder=aac',
-
-      # TODO(dalecurtis, watk): Figure out if we need h264 parser for now?
   ])
 
   def do_build_ffmpeg(branding, configure_flags):
