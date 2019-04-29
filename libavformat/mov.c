@@ -7904,6 +7904,7 @@ static int mov_seek_stream(AVFormatContext *s, AVStream *st, int64_t timestamp, 
     }
 
     /* adjust stsd index */
+    if (sc->chunk_count) {
     time_sample = 0;
     for (i = 0; i < sc->stsc_count; i++) {
         int64_t next = time_sample + mov_get_stsc_samples(sc, i);
@@ -7914,6 +7915,7 @@ static int mov_seek_stream(AVFormatContext *s, AVStream *st, int64_t timestamp, 
         }
         av_assert0(next == (int)next);
         time_sample = next;
+    }
     }
 
     return sample;
