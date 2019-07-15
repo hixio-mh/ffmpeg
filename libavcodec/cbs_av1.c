@@ -24,6 +24,7 @@
 #include "cbs_av1.h"
 #include "internal.h"
 
+#undef ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_read_uvlc(CodedBitstreamContext *ctx, GetBitContext *gbc,
                              const char *name, uint32_t *write_to,
@@ -103,6 +104,7 @@ static int cbs_av1_read_uvlc(CodedBitstreamContext *ctx, GetBitContext *gbc,
     return 0;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_uvlc(CodedBitstreamContext *ctx, PutBitContext *pbc,
                               const char *name, uint32_t value,
                               uint32_t range_min, uint32_t range_max)
@@ -146,6 +148,7 @@ static int cbs_av1_write_uvlc(CodedBitstreamContext *ctx, PutBitContext *pbc,
 
     return 0;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_read_leb128(CodedBitstreamContext *ctx, GetBitContext *gbc,
                                const char *name, uint64_t *write_to)
@@ -177,6 +180,7 @@ static int cbs_av1_read_leb128(CodedBitstreamContext *ctx, GetBitContext *gbc,
     return 0;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_leb128(CodedBitstreamContext *ctx, PutBitContext *pbc,
                                 const char *name, uint64_t value)
 {
@@ -206,6 +210,7 @@ static int cbs_av1_write_leb128(CodedBitstreamContext *ctx, PutBitContext *pbc,
 
     return 0;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_read_ns(CodedBitstreamContext *ctx, GetBitContext *gbc,
                            uint32_t n, const char *name,
@@ -257,6 +262,7 @@ static int cbs_av1_read_ns(CodedBitstreamContext *ctx, GetBitContext *gbc,
     return 0;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_ns(CodedBitstreamContext *ctx, PutBitContext *pbc,
                             uint32_t n, const char *name,
                             const int *subscripts, uint32_t value)
@@ -305,6 +311,7 @@ static int cbs_av1_write_ns(CodedBitstreamContext *ctx, PutBitContext *pbc,
 
     return 0;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_read_increment(CodedBitstreamContext *ctx, GetBitContext *gbc,
                                   uint32_t range_min, uint32_t range_max,
@@ -343,6 +350,7 @@ static int cbs_av1_read_increment(CodedBitstreamContext *ctx, GetBitContext *gbc
     return 0;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_increment(CodedBitstreamContext *ctx, PutBitContext *pbc,
                                    uint32_t range_min, uint32_t range_max,
                                    const char *name, uint32_t value)
@@ -383,6 +391,7 @@ static int cbs_av1_write_increment(CodedBitstreamContext *ctx, PutBitContext *pb
 
     return 0;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_read_subexp(CodedBitstreamContext *ctx, GetBitContext *gbc,
                                uint32_t range_max, const char *name,
@@ -434,6 +443,7 @@ static int cbs_av1_read_subexp(CodedBitstreamContext *ctx, GetBitContext *gbc,
     return err;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_subexp(CodedBitstreamContext *ctx, PutBitContext *pbc,
                                 uint32_t range_max, const char *name,
                                 const int *subscripts, uint32_t value)
@@ -497,6 +507,7 @@ static int cbs_av1_write_subexp(CodedBitstreamContext *ctx, PutBitContext *pbc,
 
     return err;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 
 static int cbs_av1_tile_log2(int blksize, int target)
@@ -656,6 +667,7 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
 #undef infer
 #undef byte_alignment
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 
 #define WRITE
 #define READWRITE write
@@ -733,6 +745,7 @@ static size_t cbs_av1_get_payload_bytes_left(GetBitContext *gbc)
 #undef infer
 #undef byte_alignment
 
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static int cbs_av1_split_fragment(CodedBitstreamContext *ctx,
                                   CodedBitstreamFragment *frag,
@@ -1052,6 +1065,7 @@ static int cbs_av1_read_unit(CodedBitstreamContext *ctx,
     return 0;
 }
 
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
 static int cbs_av1_write_obu(CodedBitstreamContext *ctx,
                              CodedBitstreamUnit *unit,
                              PutBitContext *pbc)
@@ -1291,6 +1305,7 @@ static int cbs_av1_assemble_fragment(CodedBitstreamContext *ctx,
 
     return 0;
 }
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
 static void cbs_av1_close(CodedBitstreamContext *ctx)
 {
@@ -1309,8 +1324,18 @@ const CodedBitstreamType ff_cbs_type_av1 = {
 
     .split_fragment    = &cbs_av1_split_fragment,
     .read_unit         = &cbs_av1_read_unit,
+#ifdef ENABLE_CBS_AV1_WRITE_METHODS
     .write_unit        = &cbs_av1_write_unit,
     .assemble_fragment = &cbs_av1_assemble_fragment,
+#else
+    // To reduce binary size by only including the definitions of cbs and
+    // cbs_av1 necessary for av1_parser.c in downstream Chromium, these two
+    // methods should never be called from Chrom*. Set them to NULL and remove
+    // their potential calls from cbs.[ch]. See also https://crbug.com/784610
+    // and https://crbug.com/972677.
+    .write_unit  = NULL,
+    .assemble_fragment = NULL,
+#endif  // ENABLE_CBS_AV1_WRITE_METHODS
 
     .close             = &cbs_av1_close,
 };

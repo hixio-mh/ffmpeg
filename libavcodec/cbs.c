@@ -280,6 +280,13 @@ int ff_cbs_read(CodedBitstreamContext *ctx,
     return cbs_read_fragment_content(ctx, frag);
 }
 
+// The only cbs included in downstream Chromium builds is cbs_av1, for which
+// the .write_unit and .assemble_fragment fptrs are NULL as part of reducing
+// binary size by only including the definitions of cbs and cbs_av1 necessary
+// for av1_parser.c
+// See also https://crbug.com/784610, and the first FFmpeg roll including
+// av1_parser: https://crbug.com/972677.
+#if 0
 
 int ff_cbs_write_fragment_data(CodedBitstreamContext *ctx,
                                CodedBitstreamFragment *frag)
@@ -365,6 +372,8 @@ int ff_cbs_write_packet(CodedBitstreamContext *ctx,
 
     return 0;
 }
+
+#endif  // 0
 
 
 void ff_cbs_trace_header(CodedBitstreamContext *ctx,
