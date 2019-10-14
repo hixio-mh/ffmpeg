@@ -35,7 +35,7 @@
 #include "video.h"
 
 #define OFFSET(x) offsetof(GBlurContext, x)
-#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM
+#define FLAGS AV_OPT_FLAG_VIDEO_PARAM|AV_OPT_FLAG_FILTERING_PARAM|AV_OPT_FLAG_RUNTIME_PARAM
 
 static const AVOption gblur_options[] = {
     { "sigma",  "set sigma",            OFFSET(sigma),  AV_OPT_TYPE_FLOAT, {.dbl=0.5}, 0.0, 1024, FLAGS },
@@ -379,4 +379,5 @@ AVFilter ff_vf_gblur = {
     .inputs        = gblur_inputs,
     .outputs       = gblur_outputs,
     .flags         = AVFILTER_FLAG_SUPPORT_TIMELINE_GENERIC | AVFILTER_FLAG_SLICE_THREADS,
+    .process_command = ff_filter_process_command,
 };
