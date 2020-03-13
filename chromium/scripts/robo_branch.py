@@ -268,7 +268,7 @@ def IsUploadedForReview(robo_configuration):
     log("No Gerrit issue number exsts.")
     return False
 
-  if not IsWorkingDirectoryClean():
+  if not IsWorkingDirectorClean(robo_configuration):
     log("Working directory is not clean -- commit changes and update CL");
     return False
 
