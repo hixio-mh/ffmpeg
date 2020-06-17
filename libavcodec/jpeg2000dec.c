@@ -612,12 +612,19 @@ static int get_rgn(Jpeg2000DecoderContext *s, int n)
     // Currently compno cannot be greater than 4.
     // However, future implementation should support compno up to 65536
     if (compno < s->ncomponents) {
-        if (s->curtileno == -1)
-            s->roi_shift[compno] = bytestream2_get_byte(&s->g);
-        else {
+        int v;
+        if (s->curtileno == -1) {
+            v =  bytestream2_get_byte(&s->g);
+            if (v > 30)
+                return AVERROR_PATCHWELCOME;
+            s->roi_shift[compno] = v;
+        } else {
             if (s->tile[s->curtileno].tp_idx != 0)
                 return AVERROR_INVALIDDATA; // marker occurs only in first tile part of tile
-            s->tile[s->curtileno].comp[compno].roi_shift = bytestream2_get_byte(&s->g);
+            v = bytestream2_get_byte(&s->g);
+            if (v > 30)
+                return AVERROR_PATCHWELCOME;
+            s->tile[s->curtileno].comp[compno].roi_shift = v;
         }
         return 0;
     }
@@ -928,6 +935,7 @@ static int get_ppt(Jpeg2000DecoderContext *s, int n)
         tile->packed_headers = new;
     } else
         return AVERROR(ENOMEM);
+    memset(&tile->packed_headers_stream, 0, sizeof(tile->packed_headers_stream));
     memcpy(tile->packed_headers + tile->packed_headers_size,
            s->g.buffer, n - 3);
     tile->packed_headers_size += n - 3;
@@ -1668,8 +1676,8 @@ static int decode_cblk(Jpeg2000DecoderContext *s, Jpeg2000CodingStyle *codsty,
     ff_mqc_initdec(&t1->mqc, cblk->data, 0, 1);
 
     while (passno--) {
-        if (bpno < 0) {
-            av_log(s->avctx, AV_LOG_ERROR, "bpno became negative\n");
+        if (bpno < 0 || bpno > 29) {
+            av_log(s->avctx, AV_LOG_ERROR, "bpno became invalid\n");
             return AVERROR_INVALIDDATA;
         }
         switch(pass_t) {
@@ -2014,6 +2022,8 @@ static void jpeg2000_dec_cleanup(Jpeg2000DecoderContext *s)
                 ff_jpeg2000_cleanup(comp, codsty);
             }
             av_freep(&s->tile[tileno].comp);
+            av_freep(&s->tile[tileno].packed_headers);
+            s->tile[tileno].packed_headers_size = 0;
         }
     }
     av_freep(&s->tile);

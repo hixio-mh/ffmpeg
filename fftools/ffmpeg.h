@@ -430,7 +430,8 @@ enum forced_keyframes_const {
     FKF_NB
 };
 
-#define ABORT_ON_FLAG_EMPTY_OUTPUT (1 <<  0)
+#define ABORT_ON_FLAG_EMPTY_OUTPUT        (1 <<  0)
+#define ABORT_ON_FLAG_EMPTY_OUTPUT_STREAM (1 <<  1)
 
 extern const char *const forced_keyframes_const_names[];
 
@@ -459,8 +460,7 @@ typedef struct OutputStream {
     AVRational mux_timebase;
     AVRational enc_timebase;
 
-    int                    nb_bitstream_filters;
-    AVBSFContext            **bsf_ctx;
+    AVBSFContext            *bsf_ctx;
 
     AVCodecContext *enc_ctx;
     AVCodecParameters *ref_par; /* associated input codec parameters with encoders options applied */

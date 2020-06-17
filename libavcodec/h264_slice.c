@@ -243,6 +243,15 @@ static int alloc_picture(H264Context *h, H264Picture *pic)
         pic->ref_index[i]  = pic->ref_index_buf[i]->data;
     }
 
+    pic->pps_buf = av_buffer_ref(h->ps.pps_ref);
+    if (!pic->pps_buf)
+        goto fail;
+    pic->pps = (const PPS*)pic->pps_buf->data;
+
+    pic->mb_width  = h->mb_width;
+    pic->mb_height = h->mb_height;
+    pic->mb_stride = h->mb_stride;
+
     return 0;
 fail:
     ff_h264_unref_picture(h, pic);
@@ -1279,6 +1288,20 @@ static int h264_export_frame_props(H264Context *h)
 
         h->avctx->properties |= FF_CODEC_PROPERTY_CLOSED_CAPTIONS;
     }
+
+    for (int i = 0; i < h->sei.unregistered.nb_buf_ref; i++) {
+        H264SEIUnregistered *unreg = &h->sei.unregistered;
+
+        if (unreg->buf_ref[i]) {
+            AVFrameSideData *sd = av_frame_new_side_data_from_buf(cur->f,
+                    AV_FRAME_DATA_SEI_UNREGISTERED,
+                    unreg->buf_ref[i]);
+            if (!sd)
+                av_buffer_unref(&unreg->buf_ref[i]);
+            unreg->buf_ref[i] = NULL;
+        }
+    }
+    h->sei.unregistered.nb_buf_ref = 0;
 
     if (h->sei.picture_timing.timecode_cnt > 0) {
         uint32_t tc = 0;

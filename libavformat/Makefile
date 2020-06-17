@@ -93,7 +93,7 @@ OBJS-$(CONFIG_AMRWB_DEMUXER)             += amr.o
 OBJS-$(CONFIG_ANM_DEMUXER)               += anm.o
 OBJS-$(CONFIG_APC_DEMUXER)               += apc.o
 OBJS-$(CONFIG_APE_DEMUXER)               += ape.o apetag.o img2.o
-OBJS-$(CONFIG_APM_DEMUXER)               += apm.o
+OBJS-$(CONFIG_APM_DEMUXER)               += apm.o riffdec.o
 OBJS-$(CONFIG_APNG_DEMUXER)              += apngdec.o
 OBJS-$(CONFIG_APNG_MUXER)                += apngenc.o
 OBJS-$(CONFIG_APTX_DEMUXER)              += aptxdec.o rawdec.o
@@ -205,7 +205,7 @@ OBJS-$(CONFIG_GIF_DEMUXER)               += gifdec.o
 OBJS-$(CONFIG_GSM_DEMUXER)               += gsmdec.o
 OBJS-$(CONFIG_GSM_MUXER)                 += rawenc.o
 OBJS-$(CONFIG_GXF_DEMUXER)               += gxf.o
-OBJS-$(CONFIG_GXF_MUXER)                 += gxfenc.o audiointerleave.o
+OBJS-$(CONFIG_GXF_MUXER)                 += gxfenc.o
 OBJS-$(CONFIG_G722_DEMUXER)              += g722.o rawdec.o
 OBJS-$(CONFIG_G722_MUXER)                += rawenc.o
 OBJS-$(CONFIG_G723_1_DEMUXER)            += g723_1.o
@@ -285,6 +285,7 @@ OBJS-$(CONFIG_JACOSUB_MUXER)             += jacosubenc.o rawenc.o
 OBJS-$(CONFIG_JV_DEMUXER)                += jvdec.o
 OBJS-$(CONFIG_KUX_DEMUXER)               += flvdec.o
 OBJS-$(CONFIG_KVAG_DEMUXER)              += kvag.o
+OBJS-$(CONFIG_KVAG_MUXER)                += kvag.o rawenc.o
 OBJS-$(CONFIG_LATM_MUXER)                += latmenc.o rawenc.o
 OBJS-$(CONFIG_LMLM4_DEMUXER)             += lmlm4.o
 OBJS-$(CONFIG_LOAS_DEMUXER)              += loasdec.o rawdec.o
@@ -347,7 +348,7 @@ OBJS-$(CONFIG_MUSX_DEMUXER)              += musx.o
 OBJS-$(CONFIG_MV_DEMUXER)                += mvdec.o
 OBJS-$(CONFIG_MVI_DEMUXER)               += mvi.o
 OBJS-$(CONFIG_MXF_DEMUXER)               += mxfdec.o mxf.o
-OBJS-$(CONFIG_MXF_MUXER)                 += mxfenc.o mxf.o audiointerleave.o avc.o
+OBJS-$(CONFIG_MXF_MUXER)                 += mxfenc.o mxf.o avc.o
 OBJS-$(CONFIG_MXG_DEMUXER)               += mxg.o
 OBJS-$(CONFIG_NC_DEMUXER)                += ncdec.o
 OBJS-$(CONFIG_NISTSPHERE_DEMUXER)        += nistspheredec.o pcm.o
@@ -360,7 +361,6 @@ OBJS-$(CONFIG_NUV_DEMUXER)               += nuv.o
 OBJS-$(CONFIG_AV1_DEMUXER)               += av1dec.o
 OBJS-$(CONFIG_OGG_DEMUXER)               += oggdec.o         \
                                             oggparsecelt.o   \
-                                            oggparsedaala.o  \
                                             oggparsedirac.o  \
                                             oggparseflac.o   \
                                             oggparseogm.o    \
@@ -428,6 +428,7 @@ OBJS-$(CONFIG_PCM_VIDC_DEMUXER)          += pcmdec.o pcm.o
 OBJS-$(CONFIG_PCM_VIDC_MUXER)            += pcmenc.o rawenc.o
 OBJS-$(CONFIG_PJS_DEMUXER)               += pjsdec.o subtitles.o
 OBJS-$(CONFIG_PMP_DEMUXER)               += pmpdec.o
+OBJS-$(CONFIG_PP_BNK_DEMUXER)            += pp_bnk.o
 OBJS-$(CONFIG_PVA_DEMUXER)               += pva.o
 OBJS-$(CONFIG_PVF_DEMUXER)               += pvfdec.o pcm.o
 OBJS-$(CONFIG_QCP_DEMUXER)               += qcp.o
@@ -669,3 +670,4 @@ TOOLS     = aviocat                                                     \
             probetest                                                   \
             seek_print                                                  \
             sidxindex                                                   \
+            venc_data_dump

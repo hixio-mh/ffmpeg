@@ -304,6 +304,7 @@ External library support:
   --enable-mbedtls         enable mbedTLS, needed for https support
                            if openssl, gnutls or libtls is not used [no]
   --enable-mediacodec      enable Android MediaCodec support [no]
+  --enable-mediafoundation enable encoding via MediaFoundation [auto]
   --enable-libmysofa       enable libmysofa, needed for sofalizer filter [no]
   --enable-openal          enable OpenAL 1.1 capture support [no]
   --enable-opencl          enable OpenCL processing [no]
@@ -1704,6 +1705,7 @@ EXTERNAL_AUTODETECT_LIBRARY_LIST="
     libxcb_shape
     libxcb_xfixes
     lzma
+    mediafoundation
     schannel
     sdl2
     securetransport
@@ -2797,6 +2799,7 @@ mwsc_decoder_deps="zlib"
 mxpeg_decoder_select="mjpeg_decoder"
 nellymoser_decoder_select="mdct sinewin"
 nellymoser_encoder_select="audio_frame_queue mdct sinewin"
+notchlc_decoder_select="lzf"
 nuv_decoder_select="idctdsp lzo"
 on2avc_decoder_select="mdct"
 opus_decoder_deps="swresample"
@@ -3011,6 +3014,8 @@ wmv3_vaapi_hwaccel_select="vc1_vaapi_hwaccel"
 wmv3_vdpau_hwaccel_select="vc1_vdpau_hwaccel"
 
 # hardware-accelerated codecs
+mediafoundation_deps="mftransform_h MFCreateAlignedMemoryBuffer"
+mediafoundation_extralibs="-lmfplat -lmfuuid -lole32 -lstrmiids"
 omx_deps="libdl pthreads"
 omx_rpi_select="omx"
 qsv_deps="libmfx"
@@ -3035,6 +3040,8 @@ nvenc_deps="ffnvcodec"
 nvenc_deps_any="libdl LoadLibrary"
 nvenc_encoder_deps="nvenc"
 
+aac_mf_encoder_deps="mediafoundation"
+ac3_mf_encoder_deps="mediafoundation"
 h263_v4l2m2m_decoder_deps="v4l2_m2m h263_v4l2_m2m"
 h263_v4l2m2m_encoder_deps="v4l2_m2m h263_v4l2_m2m"
 h264_amf_encoder_deps="amf"
@@ -3043,6 +3050,7 @@ h264_cuvid_decoder_deps="cuvid"
 h264_cuvid_decoder_select="h264_mp4toannexb_bsf"
 h264_mediacodec_decoder_deps="mediacodec"
 h264_mediacodec_decoder_select="h264_mp4toannexb_bsf h264_parser"
+h264_mf_encoder_deps="mediafoundation"
 h264_mmal_decoder_deps="mmal"
 h264_nvenc_encoder_deps="nvenc"
 h264_omx_encoder_deps="omx"
@@ -3059,6 +3067,7 @@ hevc_cuvid_decoder_deps="cuvid"
 hevc_cuvid_decoder_select="hevc_mp4toannexb_bsf"
 hevc_mediacodec_decoder_deps="mediacodec"
 hevc_mediacodec_decoder_select="hevc_mp4toannexb_bsf hevc_parser"
+hevc_mf_encoder_deps="mediafoundation"
 hevc_nvenc_encoder_deps="nvenc"
 hevc_qsv_decoder_select="hevc_mp4toannexb_bsf qsvdec"
 hevc_qsv_encoder_select="hevcparse qsvenc"
@@ -3075,6 +3084,7 @@ mjpeg_qsv_encoder_deps="libmfx"
 mjpeg_qsv_encoder_select="qsvenc"
 mjpeg_vaapi_encoder_deps="VAEncPictureParameterBufferJPEG"
 mjpeg_vaapi_encoder_select="cbs_jpeg jpegtables vaapi_encode"
+mp3_mf_encoder_deps="mediafoundation"
 mpeg1_cuvid_decoder_deps="cuvid"
 mpeg1_v4l2m2m_decoder_deps="v4l2_m2m mpeg1_v4l2_m2m"
 mpeg2_crystalhd_decoder_select="crystalhd"
@@ -3283,6 +3293,8 @@ eac3_demuxer_select="ac3_parser"
 f4v_muxer_select="mov_muxer"
 fifo_muxer_deps="threads"
 flac_demuxer_select="flac_parser"
+flv_muxer_select="aac_adtstoasc_bsf"
+gxf_muxer_select="pcm_rechunk_bsf"
 hds_muxer_select="flv_muxer"
 hls_muxer_select="mpegts_muxer"
 hls_muxer_suggest="gcrypt openssl"
@@ -3291,22 +3303,23 @@ image2_brender_pix_demuxer_select="image2_demuxer"
 ipod_muxer_select="mov_muxer"
 ismv_muxer_select="mov_muxer"
 ivf_muxer_select="av1_metadata_bsf vp9_superframe_bsf"
+latm_muxer_select="aac_adtstoasc_bsf"
 matroska_audio_muxer_select="matroska_muxer"
 matroska_demuxer_select="iso_media riffdec"
 matroska_demuxer_suggest="bzlib lzo zlib"
-matroska_muxer_select="iso_media riffenc"
+matroska_muxer_select="iso_media riffenc vp9_superframe_bsf aac_adtstoasc_bsf"
 mlp_demuxer_select="mlp_parser"
 mmf_muxer_select="riffenc"
 mov_demuxer_select="iso_media riffdec"
 mov_demuxer_suggest="zlib"
-mov_muxer_select="iso_media riffenc rtpenc_chain"
+mov_muxer_select="iso_media riffenc rtpenc_chain vp9_superframe_bsf aac_adtstoasc_bsf"
 mp3_demuxer_select="mpegaudio_parser"
 mp3_muxer_select="mpegaudioheader"
 mp4_muxer_select="mov_muxer"
 mpegts_demuxer_select="iso_media"
-mpegts_muxer_select="adts_muxer latm_muxer"
+mpegts_muxer_select="adts_muxer latm_muxer h264_mp4toannexb_bsf hevc_mp4toannexb_bsf"
 mpegtsraw_demuxer_select="mpegts_demuxer"
-mxf_muxer_select="golomb"
+mxf_muxer_select="golomb pcm_rechunk_bsf"
 mxf_d10_muxer_select="mxf_muxer"
 mxf_opatom_muxer_select="mxf_muxer"
 nut_muxer_select="riffenc"
@@ -3354,6 +3367,8 @@ alsa_outdev_deps="alsa"
 avfoundation_indev_deps="avfoundation corevideo coremedia pthreads"
 avfoundation_indev_suggest="coregraphics applicationservices"
 avfoundation_indev_extralibs="-framework Foundation"
+audiotoolbox_outdev_deps="audiotoolbox pthreads"
+audiotoolbox_outdev_extralibs="-framework AudioToolbox -framework CoreAudio"
 bktr_indev_deps_any="dev_bktr_ioctl_bt848_h machine_ioctl_bt848_h dev_video_bktr_ioctl_bt848_h dev_ic_bt8xx_h"
 caca_outdev_deps="libcaca"
 decklink_deps_any="libdl LoadLibrary"
@@ -3566,6 +3581,7 @@ sab_filter_deps="gpl swscale"
 scale2ref_filter_deps="swscale"
 scale_filter_deps="swscale"
 scale_qsv_filter_deps="libmfx"
+scdet_filter_select="scene_sad"
 select_filter_select="scene_sad"
 sharpness_vaapi_filter_deps="vaapi"
 showcqt_filter_deps="avcodec avformat swscale"
@@ -6102,6 +6118,7 @@ check_headers io.h
 check_headers linux/perf_event.h
 check_headers libcrystalhd/libcrystalhd_if.h
 check_headers malloc.h
+check_headers mftransform.h
 check_headers net/udplite.h
 check_headers poll.h
 check_headers sys/param.h
@@ -6142,6 +6159,7 @@ enabled videotoolbox && check_apple_framework VideoToolbox
 check_apple_framework CoreFoundation
 check_apple_framework CoreMedia
 check_apple_framework CoreVideo
+check_apple_framework CoreAudio
 
 enabled avfoundation && {
     disable coregraphics applicationservices
@@ -6164,6 +6182,7 @@ check_type "windows.h dxva.h" "DXVA_PicParams_VP9" -DWINAPI_FAMILY=WINAPI_FAMILY
 check_type "windows.h d3d11.h" "ID3D11VideoDecoder"
 check_type "windows.h d3d11.h" "ID3D11VideoContext"
 check_type "d3d9.h dxva2api.h" DXVA2_ConfigPictureDecode -D_WIN32_WINNT=0x0602
+check_func_headers mfapi.h MFCreateAlignedMemoryBuffer -lmfplat
 
 check_type "vdpau/vdpau.h" "VdpPictureInfoHEVC"
 check_type "vdpau/vdpau.h" "VdpPictureInfoVP9"
