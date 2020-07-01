@@ -162,8 +162,6 @@ def ListSteps():
 def main(argv):
   robo_configuration = robo_lib.RoboConfiguration()
   robo_configuration.chdir_to_ffmpeg_home();
-  log(robo_branch.IsUploadedForReviewAndLanded(robo_configuration))
-  raise Exception("done")
 
   # TODO(liberato): Add a way to skip |skip_fn|.
   parsed, remaining = getopt.getopt(argv, "",
