@@ -109,6 +109,21 @@ the received message may be truncated causing decoding errors.
 The timeout in seconds during the initial connection to the broker. The
 default value is rw_timeout, or 5 seconds if rw_timeout is not set.
 
+@item delivery_mode @var{mode}
+Sets the delivery mode of each message sent to broker.
+The following values are accepted:
+@table @samp
+@item persistent
+Delivery mode set to "persistent" (2). This is the default value.
+Messages may be written to the broker's disk depending on its setup.
+
+@item non-persistent
+Delivery mode set to "non-persistent" (1).
+Messages will stay in broker's memory unless the broker is under memory
+pressure.
+
+@end table
+
 @end table
 
 @section async
@@ -1255,7 +1270,7 @@ options.
 This protocol accepts the following options.
 
 @table @option
-@item connect_timeout
+@item connect_timeout=@var{milliseconds}
 Connection timeout; SRT cannot connect for RTT > 1500 msec
 (2 handshake exchanges) with the default connect timeout of
 3 seconds. This option applies to the caller and rendezvous
@@ -1286,7 +1301,7 @@ IP Type of Service. Applies to sender only. Default value is 0xB8.
 @item ipttl=@var{ttl}
 IP Time To Live. Applies to sender only. Default value is 64.
 
-@item latency
+@item latency=@var{microseconds}
 Timestamp-based Packet Delivery Delay.
 Used to absorb bursts of missed packet retransmissions.
 This flag sets both @option{rcvlatency} and @option{peerlatency}
@@ -1297,7 +1312,7 @@ when side is sender and @option{rcvlatency}
 when side is receiver, and the bidirectional stream
 sending is not supported.
 
-@item listen_timeout
+@item listen_timeout=@var{microseconds}
 Set socket listen timeout.
 
 @item maxbw=@var{bytes/seconds}
@@ -1377,7 +1392,7 @@ use a bigger maximum frame size, though not greater than
 @item pkt_size=@var{bytes}
 Alias for @samp{payload_size}.
 
-@item peerlatency
+@item peerlatency=@var{microseconds}
 The latency value (as described in @option{rcvlatency}) that is
 set by the sender side as a minimum value for the receiver.
 
@@ -1389,7 +1404,7 @@ Not required on receiver (set to 0),
 key size obtained from sender in HaiCrypt handshake.
 Default value is 0.
 
-@item rcvlatency
+@item rcvlatency=@var{microseconds}
 The time that should elapse since the moment when the
 packet was sent and the moment when it's delivered to
 the receiver application in the receiving function.
@@ -1407,7 +1422,7 @@ Set UDP receive buffer size, expressed in bytes.
 @item send_buffer_size=@var{bytes}
 Set UDP send buffer size, expressed in bytes.
 
-@item timeout
+@item timeout=@var{microseconds}
 Set raise error timeouts for read, write and connect operations. Note that the
 SRT library has internal timeouts which can be controlled separately, the
 value set here is only a cap on those.

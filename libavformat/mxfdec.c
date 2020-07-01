@@ -362,8 +362,9 @@ static void mxf_free_metadataset(MXFMetadataSet **ctx, int freectx)
     default:
         break;
     }
-    if (freectx)
-    av_freep(ctx);
+    if (freectx) {
+        av_freep(ctx);
+    }
 }
 
 static int64_t klv_decode_ber_length(AVIOContext *pb)
@@ -866,6 +867,7 @@ static inline int mxf_read_utf16_string(AVIOContext *pb, int size, char** str, i
         return AVERROR(EINVAL);
 
     buf_size = size + size / 2 + 1;
+    av_free(*str);
     *str = av_malloc(buf_size);
     if (!*str)
         return AVERROR(ENOMEM);

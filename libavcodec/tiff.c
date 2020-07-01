@@ -393,7 +393,7 @@ static int tiff_uncompress(uint8_t *dst, unsigned long *len, const uint8_t *src,
     z_stream zstream = { 0 };
     int zret;
 
-    zstream.next_in   = (uint8_t *)src;
+    zstream.next_in   = src;
     zstream.avail_in  = size;
     zstream.next_out  = dst;
     zstream.avail_out = *len;
@@ -589,7 +589,7 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
         av_assert0(s->bpp == 24);
     }
     if (s->is_bayer) {
-        width = (s->bpp * s->width + 7) >> 3;
+        av_assert0(width == (s->bpp * s->width + 7) >> 3);
     }
     if (p->format == AV_PIX_FMT_GRAY12) {
         av_fast_padded_malloc(&s->yuv_line, &s->yuv_line_size, width);
@@ -679,6 +679,9 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
         return 0;
     }
 
+    if (is_dng && stride == 0)
+        return AVERROR_INVALIDDATA;
+
     for (line = 0; line < lines; line++) {
         if (src - ssrc > size) {
             av_log(s->avctx, AV_LOG_ERROR, "Source data overread\n");
@@ -704,18 +707,20 @@ static int tiff_unpack_strip(TiffContext *s, AVFrame *p, uint8_t *dst, int strid
 
             /* Color processing for DNG images with uncompressed strips (non-tiled) */
             if (is_dng) {
-                int is_u16, pixel_size_bytes, pixel_size_bits;
+                int is_u16, pixel_size_bytes, pixel_size_bits, elements;
 
                 is_u16 = (s->bpp > 8);
                 pixel_size_bits = (is_u16 ? 16 : 8);
                 pixel_size_bytes = (is_u16 ? sizeof(uint16_t) : sizeof(uint8_t));
 
+                elements = width / pixel_size_bytes * pixel_size_bits / s->bpp * s->bppcount; // need to account for [1, 16] bpp
+                av_assert0 (elements * pixel_size_bytes <= FFABS(stride));
                 dng_blit(s,
                          dst,
                          0, // no stride, only 1 line
                          dst,
                          0, // no stride, only 1 line
-                         width / pixel_size_bytes * pixel_size_bits / s->bpp * s->bppcount, // need to account for [1, 16] bpp
+                         elements,
                          1,
                          0, // single-component variation is only preset in JPEG-encoded DNGs
                          is_u16);
@@ -1756,6 +1761,7 @@ static int decode_frame(AVCodecContext *avctx,
     GetByteContext stripdata;
     int retry_for_subifd, retry_for_page;
     int is_dng;
+    int has_tile_bits, has_strip_bits;
 
     bytestream2_init(&s->gb, avpkt->data, avpkt->size);
 
@@ -1858,6 +1864,8 @@ again:
     }
 
     if (is_dng) {
+        int bps;
+
         if (s->white_level == 0)
             s->white_level = (1 << s->bpp) - 1; /* Default value as per the spec */
 
@@ -1866,10 +1874,26 @@ again:
                 s->black_level, s->white_level);
             return AVERROR_INVALIDDATA;
         }
+
+        if (s->bpp % s->bppcount)
+            return AVERROR_INVALIDDATA;
+        bps = s->bpp / s->bppcount;
+        if (bps < 8 || bps > 32)
+            return AVERROR_INVALIDDATA;
+        if (s->planar)
+            return AVERROR_PATCHWELCOME;
     }
 
     if (!s->is_tiled && !s->strippos && !s->stripoff) {
         av_log(avctx, AV_LOG_ERROR, "Image data is missing\n");
+        return AVERROR_INVALIDDATA;
+    }
+
+    has_tile_bits  = s->is_tiled || s->tile_byte_counts_offset || s->tile_offsets_offset || s->tile_width || s->tile_length || s->tile_count;
+    has_strip_bits = s->strippos || s->strips || s->stripoff || s->rps || s->sot || s->sstype || s->stripsize || s->stripsizesoff;
+
+    if (has_tile_bits && has_strip_bits) {
+        av_log(avctx, AV_LOG_ERROR, "Tiled TIFF is not allowed to strip\n");
         return AVERROR_INVALIDDATA;
     }
 
